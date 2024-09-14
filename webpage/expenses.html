@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>記帳功能</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <link rel="stylesheet" href="../css/expenses.css">
+</head>
+<body>
+    <nav class="navbar navbar-expand-lg">
+        <div class="container-fluid">
+            <a class="navbar-brand" href="#">BookKeeping</a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNavDropdown" aria-controls="navbarNavDropdown" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNavDropdown">
+                <ul class="navbar-nav">
+                    <li class="nav-item">
+                        <a class="nav-link active" aria-current="page" href="account_book.html">主頁</a>
+                    </li>
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle active" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                            帳本
+                        </a>
+                        <ul class="dropdown-menu">
+                            <li><a class="dropdown-item" href="#">收入</a></li>
+                            <li><a class="dropdown-item" href="expenses.html">支出</a></li>
+                            <li><a class="dropdown-item" href="#">轉帳</a></li>
+                        </ul>
+                    </li>
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle active" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                            圖表分析
+                        </a>
+                        <ul class="dropdown-menu">
+                            <li><a class="dropdown-item" href="#">支出類別表</a></li>
+                            <li><a class="dropdown-item" href="#">支出帳戶比</a></li>
+                        </ul>
+                    </li>
+                </ul>
+                <ul class="navbar-nav ms-auto"> <!-- 使用 ms-auto 將 logout 鏈接推到最右邊 -->
+                    <li class="nav-item">
+                        <a class="nav-link" href="#">Logout</a> <!-- 添加 logout 鏈接 -->
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container mt-5">
+        <!-- 顯示總消費 -->
+        <div class="text-center mb-4">
+            <h6 class="text-secondary">總消費</h6>
+            <div class="d-flex justify-content-center align-items-center">
+                <h5 class="text-secondary">$</h5>
+                <h1 id="total-amount">0</h1>
+            </div>
+        </div>
+
+        <!-- 按鈕群組 -->
+        <div class="d-flex justify-content-between mb-4">
+            <button id="add-expense" class="btn btn-custom">新增支出</button>
+            <button id="category-filter" class="btn btn-custom">選擇分類</button>
+        </div>
+
+        <!-- 支出明細表格 -->
+        <div class="table-responsive">
+            <table class="table table-hover align-middle">
+                <thead>
+                    <tr>
+                        <th scope="col">日期</th>+++++++++
+                        <th scope="col">類別</th>
+                        <th scope="col">名稱</th>
+                        <th scope="col">金額</th>
+                        <th scope="col">支付方式</th>
+                        <th scope="col">操作</th>
+                    </tr>
+                </thead>
+                <tbody id="expense-table">
+                    <!-- 支出明細將動態加載於此 -->
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- 新增支出Modal -->
+    <div class="modal fade" id="expenseModal" tabindex="-1" aria-labelledby="expenseModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="expenseModalLabel">新增支出</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="expense-form">
+                        <div class="mb-3">
+                            <label for="expense-name" class="form-label">支出名稱</label>
+                            <input type="text" class="form-control" id="expense-name" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="expense-category" class="form-label">支出分類</label>
+                            <select class="form-select" id="expense-category" required>
+                                <option value="food">食物</option>
+                                <option value="transport">交通</option>
+                                <option value="rent">房租</option>
+                            </select>
+                        </div>
+                        <div class="mb-3">
+                            <label for="expense-amount" class="form-label">金額</label>
+                            <input type="number" class="form-control" id="expense-amount" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="expense-date" class="form-label">日期</label>
+                            <input type="date" class="form-control" id="expense-date" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="expense-payment" class="form-label">支付方式</label>
+                            <select class="form-select" id="expense-payment" required>
+                                <option value="cash">現金</option>
+                                <option value="credit-card">信用卡</option>
+                                <option value="mobile-payment">行動支付</option>
+                            </select>
+                        </div>
+                        <button type="submit" class="btn btn-primary">新增</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <footer class="footer-custom">
+        <div class="container text-center">
+            <p>@Hsin_Account_book</p>
+        </div>
+    </footer>
+
+    <!-- 引入外部 JavaScript -->
+    <script src="../js/expenses.js"></script>
+</body>
+</html>

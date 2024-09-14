@@ -1,25 +1,35 @@
-body, html {
+/* 確保頁面內容延伸以填滿整個視窗 */
+html, body {
     height: 100%;
     margin: 0;
     display: flex;
     justify-content: center;
     align-items: center;
-    background-color: #f8f9fa; /* 淺灰色背景 */
+    background-image: url('../img/i_have_a_plan.jpg'); /* 設定背景圖片 */
+    background-size: cover; /* 確保圖片覆蓋整個頁面 */
+    background-position: center; /* 置中圖片 */
+    background-attachment: fixed; /* 背景圖片固定在視窗 */
 }
-.login-container, .modal-content {
-    background-color: #ffffff; /* 白色背景 */
-    border: 1px solid #ddd;
-    border-radius: 5px;
-}
+
+/* 設定登入容器的樣式 */
 .login-container {
-    width: 400px;
-    padding: 20px;
-    box-shadow: 0 0 10px rgba(0,0,0,0.1);
+    background-color: #ffffff; /* 白色背景 */
+    border: 1px solid #ddd; /* 邊框顏色 */
+    border-radius: 5px; /* 邊框圓角 */
+    width: 400px; /* 設定寬度 */
+    padding: 20px; /* 內邊距 */
+    box-shadow: 0 0 10px rgba(0,0,0,0.1); /* 輕微的陰影 */
 }
+
+/* 設定模態視窗內容樣式 */
 .modal-content {
+    background-color: #ffffff; /* 白色背景 */
+    border: 1px solid #ddd; /* 邊框顏色 */
+    border-radius: 5px; /* 邊框圓角 */
     width: 100%;
     max-width: 500px; /* 設定最大寬度 */
 }
+
 /* 設定按鈕顏色為淺灰色 */
 .btn-primary {
     background-color: #d6d6d6; /* 淺灰色背景 */
@@ -42,6 +52,7 @@ body, html {
     color: #757575; /* 鼠標懸停時的顏色 */
 }
 
+/* 調整模態視窗的樣式，使其在垂直方向上居中 */
 .modal-dialog {
     display: flex;
     justify-content: center;

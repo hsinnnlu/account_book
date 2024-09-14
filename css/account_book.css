@@ -1,0 +1,77 @@
+/* 確保頁面內容延伸以填滿整個視窗 */
+html, body {
+    height: 100%;
+    margin: 0;
+}
+
+/* 使用 Flexbox 保持 footer 在頁面的最底部 */
+body {
+    display: flex;
+    flex-direction: column;
+}
+
+/* 使主要內容區域擴展以填滿剩餘空間 */
+.content {
+    flex: 1;
+}
+
+/* 設定 header 的樣式以顯示背景圖片 */
+header.masthead {
+    background-size: cover; /* 確保圖片覆蓋整個區域 */
+    background-position: center; /* 置中圖片 */
+    height: 100vh; /* 設定為視窗高度 */
+    color: #fff; /* 文字顏色 */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+}
+
+/* 設定 navbar 背景顏色為深色 */
+.navbar {
+    background-color: #ecf0f2; /* 深色背景（可以更改為所需顏色） */
+}
+
+/* 設定 navbar 文字顏色 */
+.navbar-brand, .nav-link {
+    color: #4d4949; /* 深色文字 */
+}
+
+/* 設定 footer 背景顏色為與 navbar 相同的深色 */
+.footer-custom {
+    background-color: #ecf0f2; /* 與 navbar 相同的深色背景 */
+    color: #4d4949; /* 深色文字 */
+    text-align: center;
+    padding-top: 1rem; /* 添加內邊距以增加可讀性 */
+    margin-top: auto; /* 確保 footer 始終在頁面底部 */
+}
+
+header.masthead:before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: #212529;
+    opacity: 0.5;
+}
+
+header.masthead {
+    position: relative;
+    /* margin-bottom: 3rem; */
+    height: 100vh; /* 設定為視窗高度 */
+    padding-top: calc(8rem + 57px);
+    padding-bottom: 8rem;
+    background: no-repeat center center;
+    background-color: #6c757d;
+    background-size: cover;
+    background-attachment: scroll;
+}
+
+.site-heading h1 {
+    font-size: 2.5rem; /* 更大的字體大小 */
+    font-weight: bolder; /* 更粗的字體 */
+    color: #fff; /* 文字顏色，確保與背景對比 */
+    margin: 0; /* 移除外邊距 */
+}

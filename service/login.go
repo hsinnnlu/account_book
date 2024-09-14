@@ -11,3 +11,4 @@ import (
 func LoginPage(c *gin.Context) {
 	c.HTML(http.StatusOK, "login.html", nil)
 }
+
