@@ -10,6 +10,7 @@ func main() {
 
 	router := gin.Default()
 
+	router.Static("/js", "./js")
 	router.Static("/css", "./css")
 	router.Static("/img", "./img")
 	router.Static("/webpage", "./webpage") // 確保此路徑對應到存放 HTML 文件的目錄
