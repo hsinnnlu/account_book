@@ -41,9 +41,9 @@ function renderExpenses(category = 'all') {
 
         tableBody.append(`
             <tr>
+                <td>${expense.date}</td>
                 <td>${expense.category}</td>
                 <td>${expense.name}</td>
-                <td>${expense.date}</td>
                 <td>$${expense.amount}</td>
                 <td>${expense.payment}</td>
                 <td>
@@ -60,13 +60,13 @@ function renderExpenses(category = 'all') {
 $('#expense-form').on('submit', function(event) {
     event.preventDefault();
 
-    const name = $('#expense-name').val();
-    const category = $('#expense-category').val();
-    const amount = $('#expense-amount').val();
     const date = $('#expense-date').val();
+    const category = $('#expense-category').val();
+    const name = $('#expense-name').val();
+    const amount = $('#expense-amount').val();
     const payment = $('#expense-payment').val();
 
-    expenses.push({ name, category, amount, date, payment });
+    expenses.push({ date, category, name, amount , payment });
     renderExpenses();
 
     // 清空表單

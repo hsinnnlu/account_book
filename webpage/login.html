@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>登入介面</title>
+    <title>登入與註冊</title>
     <!-- Bootstrap 5 CSS -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
     <!-- 自訂 CSS -->
@@ -13,14 +13,14 @@
     <div class="container d-flex justify-content-center align-items-center min-vh-100">
         <div class="login-container">
             <h2 class="text-center">Login</h2>
-            <form id="loginForm">
+            <form id="loginForm" method="POST" action="/login">
                 <div class="mb-3">
                     <label for="user_id" class="form-label">帳號</label>
-                    <input type="text" class="form-control" id="user_id" placeholder="輸入帳號" required>
+                    <input type="text" class="form-control" id="user_id" name="user_id" placeholder="輸入帳號" required>
                 </div>
                 <div class="mb-3">
                     <label for="password" class="form-label">密碼</label>
-                    <input type="password" class="form-control" id="password" placeholder="輸入密碼" required>
+                    <input type="password" class="form-control" id="password" name="password" placeholder="輸入密碼" required>
                 </div>
                 <button type="submit" class="btn btn-primary w-100">登入</button>
                 <div id="message" class="mt-3"></div>
@@ -38,18 +38,18 @@
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body">
-                    <form id="registerForm">
+                    <form id="registerForm" method="POST" action="/register">
                         <div class="mb-3">
                             <label for="register_user_id" class="form-label">帳號</label>
-                            <input type="text" class="form-control" id="register_user_id" placeholder="輸入帳號" required>
+                            <input type="text" class="form-control" id="register_user_id" name="user_id" placeholder="輸入帳號" required>
                         </div>
                         <div class="mb-3">
                             <label for="register_password" class="form-label">密碼</label>
-                            <input type="password" class="form-control" id="register_password" placeholder="輸入密碼" required>
+                            <input type="password" class="form-control" id="register_password" name="password" placeholder="輸入密碼" required>
                         </div>
                         <div class="mb-3">
                             <label for="register_confirm_password" class="form-label">確認密碼</label>
-                            <input type="password" class="form-control" id="register_confirm_password" placeholder="確認密碼" required>
+                            <input type="password" class="form-control" id="register_confirm_password" name="confirm_password" placeholder="確認密碼" required>
                         </div>
                         <button type="submit" class="btn btn-primary w-100">註冊</button>
                         <div id="register_message" class="mt-3"></div>
@@ -63,5 +63,6 @@
     <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
     <!-- Bootstrap 5 JS -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="../js/login.js"></script>
 </body>
 </html>

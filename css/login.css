@@ -42,6 +42,11 @@ html, body {
     border-color: #b3b3b3; /* 更深的灰色邊框 */
 }
 
+.btn-primary:active {
+    background-color: #b3b3b3 !important; /* 更深的灰色背景 */
+    border-color: #b3b3b3 !important; /* 更深的灰色邊框 */
+}
+
 /* 設定註冊帳號的文字顏色為更淺的灰色 */
 .btn-link {
     color: #9e9e9e; /* 更淺的灰色文字 */
