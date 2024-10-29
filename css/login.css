@@ -1,14 +1,40 @@
 /* 確保頁面內容延伸以填滿整個視窗 */
 html, body {
     height: 100%;
+    width: 100%; /* 寬度設為100%，使圖片滿版 */
     margin: 0;
     display: flex;
     justify-content: center;
     align-items: center;
+    position: relative; /* 為偽元素提供上下文 */
+    background-color: rgba(179, 179, 179, 0.3); /* 背景色的透明度 */
+    overflow: hidden; /* 防止滾動條出現 */
+}
+
+body::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%; /* 寬度設為100%，使圖片滿版 */
+    height: 100%; /* 高度設為100%，使圖片滿版 */
     background-image: url('../img/i_have_a_plan.jpg'); /* 設定背景圖片 */
     background-size: cover; /* 確保圖片覆蓋整個頁面 */
     background-position: center; /* 置中圖片 */
     background-attachment: fixed; /* 背景圖片固定在視窗 */
+    opacity: 0.6; /* 調整背景圖片的透明度 */
+    z-index: -1; /* 確保圖片位於其他內容的下方 */
+}
+
+.modal-dialog {
+    position: fixed; 
+    top: 22%;  /* 垂直居中 */
+    left: 35%; /* 水平居中 */
+    transform: translate(-50%, -50%); /* 進一步確保中心對齊 */
+    min-width: 30%; /* 大螢幕下的最大寬度限制 */
+    max-width: 60%; /* 大螢幕下的最大寬度限制 */
+    width: auto; /* 根據內容自動調整寬度 */
+    margin: 0; /* 清除可能的外邊距 */
 }
 
 /* 設定登入容器的樣式 */
@@ -55,12 +81,4 @@ html, body {
 
 .btn-link:hover {
     color: #757575; /* 鼠標懸停時的顏色 */
-}
-
-/* 調整模態視窗的樣式，使其在垂直方向上居中 */
-.modal-dialog {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    min-height: calc(100% - 1.75rem); /* 確保模態視窗在垂直方向上居中 */
 }

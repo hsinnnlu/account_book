@@ -10,6 +10,7 @@
     <link href="../css/login.css" rel="stylesheet">
 </head>
 <body>
+
     <div class="container d-flex justify-content-center align-items-center min-vh-100">
         <div class="login-container">
             <h2 class="text-center">Login</h2>
@@ -67,10 +68,79 @@
     </div>
 
 
+    <!-- 註冊成功彈跳視窗 -->
+    <div class="modal fade" id="successModal" tabindex="-1" aria-labelledby="successModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="successModalLabel">註冊狀態</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body" id="success_message">
+                    註冊成功
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">關閉</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <!-- jQuery -->
     <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
     <!-- Bootstrap 5 JS -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
-    <script src="../js/login.js"></script>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+        // 處理註冊表單提交
+        const registerForm = document.getElementById('registerForm');
+        const successModal = new bootstrap.Modal(document.getElementById('successModal')); // 初始化成功模態
+        const successMessage = document.getElementById('success_message'); // 獲取成功消息元素
+
+        if (registerForm) {
+            registerForm.onsubmit = function(event) {
+                event.preventDefault(); // 防止表單的默認提交行為
+
+                const formData = new FormData(registerForm); // 收集表單數據
+
+                // 使用 Fetch API 提交表單
+                fetch('/register', {
+                    method: 'POST',
+                    body: formData
+                })
+                .then(response => response.json())
+                .then(data => {
+                    // 顯示伺服器回傳的消息
+                    const message = data.message || '註冊成功';
+                    successMessage.innerText = message; // 更新模態中的消息內容
+
+                    // 隱藏註冊模態
+                    const registerModal = bootstrap.Modal.getInstance(document.getElementById('registerModal'));
+                    if (registerModal) {
+                        registerModal.hide(); // 隱藏註冊模態
+                    }
+
+                    // 顯示成功模態
+                    successModal.show();
+                })
+                .catch(error => {
+                    console.error('錯誤:', error);
+                    successMessage.innerText = '註冊過程中出現錯誤。';
+                    
+                    // 隱藏註冊模態
+                    const registerModal = bootstrap.Modal.getInstance(document.getElementById('registerModal'));
+                    if (registerModal) {
+                        registerModal.hide(); // 隱藏註冊模態
+                    }
+                    
+                    // 顯示錯誤消息模態
+                    successModal.show(); // 顯示錯誤消息模態
+                });
+            };
+        }
+    });
+    </script>    
+    
 </body>
 </html>

@@ -8,8 +8,11 @@ import (
 	"fmt"
 	"log"
 	"net/http"
+	"strings"
 
 	"github.com/gin-gonic/gin"
+	"github.com/hsinnnlu/account_book/db"
+	"github.com/hsinnnlu/account_book/models"
 )
 
 func LoginPage(c *gin.Context) {
@@ -17,11 +20,12 @@ func LoginPage(c *gin.Context) {
 }
 
 func LoginAuth(c *gin.Context) {
+
 	input_id, input_password := preProcessingInput(c)
 	fmt.Println("Received user_id:", input_id)
 	fmt.Println("Received password:", input_password)
 
-	err := checkPassword(input_id, input_password)
+	_, err := checkPassword(input_id, input_password)
 	log.Print(err)
 	if err != nil {
 		c.HTML(http.StatusBadRequest, "login.html", gin.H{
@@ -29,6 +33,12 @@ func LoginAuth(c *gin.Context) {
 		})
 		return
 	}
+
+	// session := sessions.Default(c)
+	// session.Set("user_id", user.Id)
+	// c.SetCookie("user_cookie", user.Id, 3600, "/", "localhost", false, true)
+
+	// session.Save()
 
 	// 成功處理邏輯，例如重定向
 	c.Redirect(http.StatusSeeOther, "/webpage/account_book.html")
@@ -56,34 +66,24 @@ func preProcessingInput(c *gin.Context) (user_id, password string) {
 }
 
 // 串資料庫
-func checkPassword(user_id, inputPassword string) error {
+func checkPassword(user_id, inputPassword string) (*models.User, error) {
 	hashedInputPassword := GetHashedPassword(inputPassword)
-	fmt.Println(hashedInputPassword) // 這裡會印出輸入密碼的 SHA256 雜湊值
-
-	if user_id != "test" {
-		return errors.New("user does not exist")
-	}
-
-	storedPasswordHash := GetHashedPassword("123")
-	userpassword := GetHashedPassword(inputPassword)
-
-	if userpassword != storedPasswordHash {
-		return errors.New("password is incorrect")
-	}
+	// fmt.Println(hashedInputPassword) // 這裡會印出輸入密碼的 SHA256 雜湊值
 
 	// 檢查使用者是否存在
-	// user, err := db.GetUserById(DB, user_id)
-	// fmt.Println("pass B: ", user.Password_hash) // 這裡會印出資料庫中的密碼雜湊值
-	// if err != nil {
-	// 	fmt.Println("error:", err)
-	// 	return nil, errors.New("user does not exist")
-	// }
+	user, err := db.GetUserById(db.DB, user_id)
 
-	// storedPasswordHash := user.Password_hash
-	// if storedPasswordHash != hashedInputPassword {
-	// 	return nil, errors.New("password is incorrect")
-	// }
-	return nil
+	if err != nil {
+		fmt.Println("error:", err)
+		return nil, errors.New("user does not exist")
+	}
+
+	storedPasswordHash := strings.TrimSpace(user.Hash_password)
+	fmt.Println("db的密碼: ", storedPasswordHash)
+	if storedPasswordHash != hashedInputPassword {
+		return nil, errors.New("password is incorrect")
+	}
+	return user, nil
 }
 
 // 將密碼使用 SHA256
