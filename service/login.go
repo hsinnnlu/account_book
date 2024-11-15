@@ -10,6 +10,7 @@ import (
 	"net/http"
 	"strings"
 
+	"github.com/gin-contrib/sessions"
 	"github.com/gin-gonic/gin"
 	"github.com/hsinnnlu/account_book/db"
 	"github.com/hsinnnlu/account_book/models"
@@ -25,7 +26,7 @@ func LoginAuth(c *gin.Context) {
 	fmt.Println("Received user_id:", input_id)
 	fmt.Println("Received password:", input_password)
 
-	_, err := checkPassword(input_id, input_password)
+	user, err := checkPassword(input_id, input_password)
 	log.Print(err)
 	if err != nil {
 		c.HTML(http.StatusBadRequest, "login.html", gin.H{
@@ -34,14 +35,13 @@ func LoginAuth(c *gin.Context) {
 		return
 	}
 
-	// session := sessions.Default(c)
-	// session.Set("user_id", user.Id)
-	// c.SetCookie("user_cookie", user.Id, 3600, "/", "localhost", false, true)
+	session := sessions.Default(c)
+	session.Set("user_id", user.Id)
+	c.SetCookie("user_cookie", user.Id, 3600, "/", "localhost", false, true)
+	session.Save()
 
-	// session.Save()
-
-	// 成功處理邏輯，例如重定向
-	c.Redirect(http.StatusSeeOther, "/webpage/account_book.html")
+	// 成功處理邏輯，重定向
+	c.Redirect(http.StatusFound, "/webpage/account_book.html")
 }
 
 func preProcessingInput(c *gin.Context) (user_id, password string) {
@@ -68,8 +68,7 @@ func preProcessingInput(c *gin.Context) (user_id, password string) {
 // 串資料庫
 func checkPassword(user_id, inputPassword string) (*models.User, error) {
 	hashedInputPassword := GetHashedPassword(inputPassword)
-	// fmt.Println(hashedInputPassword) // 這裡會印出輸入密碼的 SHA256 雜湊值
-
+	
 	// 檢查使用者是否存在
 	user, err := db.GetUserById(db.DB, user_id)
 
