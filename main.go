@@ -34,5 +34,8 @@ func main() {
 	router.DELETE("/api/incomes/:id", service.Deleteincomerow)
 	router.POST("/api/incomes/insertincome", service.Insertincomerow)
 
+	router.GET("/api/expenses", auth.AuthMiddleware(), service.ExpenseDataHandler)
+	router.DELETE("/api/expenses/:id", service.Deleteexpenserow)
+	router.POST("/api/expenses/insertexpense", service.Insertexpenserow)
 	router.Run(":8080")
 }

@@ -23,7 +23,6 @@ function updateTotalAmount() {
     $('#total-amount').text(total);
 }
 
-
 // 根據日期排序收入
 function sortIncomesByDate() {
     incomes.sort((a, b) => new Date(b.Date) - new Date(a.Date));
@@ -102,8 +101,8 @@ $('#income-table').on('click', '.delete-income', function () {
             return response.json();
         })
         .then(data => {
-            alert(data.message || '刪除成功！');
             fetchIncomes(); // 刪除成功後重新渲染表格
+            alert(data.message || '刪除成功！');
         })
         .catch(error => {
             console.error('刪除收入時出錯:', error);

@@ -20,7 +20,6 @@ func IncomeHandler(c *gin.Context) {
 		return
 	}
 
-	// 僅渲染靜態頁面，不帶數據
 	c.HTML(http.StatusOK, "income.html", nil)
 }
 

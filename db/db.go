@@ -60,6 +60,7 @@ func InsertUser(user_id, hash_password string) error {
 	return nil
 }
 
+// 取得 DB 裡面的 income 資料
 func GetIncome(db *sql.DB, user_id string) ([]models.Income, error) {
 	query := `
 		SELECT 
@@ -119,6 +120,7 @@ func GetIncome(db *sql.DB, user_id string) ([]models.Income, error) {
 	return incomes, nil
 }
 
+// 刪除一筆收入資料
 func DeleteIncome(db *sql.DB, income_id string) error {
 	query := "DELETE FROM income WHERE income_id = ?"
 	result, err := db.Exec(query, income_id)
@@ -142,11 +144,6 @@ func InsertIncome(db *sql.DB, income models.Income, user_id string) error {
 	if err != nil {
 		return fmt.Errorf("查詢最大收入編號失敗: %w", err)
 	}
-	println("Date: ", income.Date)
-	println("Memo: ", income.Memo)
-	println("Amount: ", income.Amount)
-	println("account: ", income.Account)
-	println("category: ", income.Income_category)
 
 	// 設定新的 income_id
 	newIncomeID := maxIncomeID + 1
@@ -201,7 +198,7 @@ func InsertIncome(db *sql.DB, income models.Income, user_id string) error {
 func InsertIncomeCatagory(db *sql.DB, newCatagory string) error {
 	// 查詢目前最大的 income_catagory
 	var maxCatagory int
-	query := `SELECT CAST(income_catagory AS UNSIGNED) AS max_catagory 
+	query := `SELECT CAST(income_catagory AS INT) AS max_catagory 
               FROM income_catagory 
               ORDER BY max_catagory DESC 
               LIMIT 1`
@@ -229,10 +226,137 @@ func InsertIncomeCatagory(db *sql.DB, newCatagory string) error {
 	return nil
 }
 
+func GetExpenses(db *sql.DB, user_id string) ([]models.Expenses, error) {
+	query := `
+		SELECT 
+			e.expense_id,
+			CONVERT(varchar, e.expense_date, 23) AS expense_date, 
+			ec.category AS expense_category, 
+			e.item,
+			e.amount, 
+			a.account AS account_name 
+		FROM user_expense e
+		JOIN expense_category ec ON e.expense_category = ec.expense_category
+		JOIN account a ON e.account_id = a.account_id
+		WHERE e.user_id = ?
+	`
+
+	// 執行查詢
+	rows, err := db.Query(query, user_id)
+	if err != nil {
+		return nil, fmt.Errorf("查詢失敗: %v", err)
+	}
+	defer rows.Close()
+
+	// 儲存支出資料
+	var expenses []models.Expenses
+
+	// 逐列處理查詢結果
+	for rows.Next() {
+		var expense models.Expenses
+		
+		// 扫描資料列
+		err := rows.Scan(&expense.Id, &expense.Date, &expense.Expense_category, &expense.Item, &expense.Amount, &expense.Account)
+		if err != nil {
+			return nil, fmt.Errorf("掃描資料失敗: %v", err)
+		}
+
+		// 將資料加入到 expenses 列表
+		expenses = append(expenses, expense)
+
+		// 查看處理的資料
+		log.Printf("支出: %+v\n", expense)
+	}
+
+	// 檢查查詢結果是否為空
+	if len(expenses) == 0 {
+		log.Println("查詢結果為空")
+	}
+
+	// 返回查詢結果
+	return expenses, nil
+}
+
+// 刪除一筆收入資料
+func DeleteExpense(db *sql.DB, expense_id string) error {
+	query := "DELETE FROM user_expense WHERE expense_id = ?"
+	result, err := db.Exec(query, expense_id)
+	if err != nil {
+		return err
+	}
+
+	rowsAffected, err := result.RowsAffected()
+	if rowsAffected == 0 {
+		return err
+	}
+	return nil
+}
+
+// InsertExpense 將單筆支出資料插入資料庫
+func InsertExpense(db *sql.DB, expense models.Expenses, user_id string) error {
+	// 查詢當前最大的 expense_id
+	var maxExpenseID int
+	queryMaxID := "SELECT COALESCE(MAX(CAST(expense_id AS INT)), 0) FROM user_expense"
+	err := db.QueryRow(queryMaxID).Scan(&maxExpenseID)
+	if err != nil {
+		return fmt.Errorf("查詢最大支出編號失敗: %w", err)
+	}
+
+	// 設定新的 expense_id
+	newExpenseID := maxExpenseID + 1
+	expense.Id = fmt.Sprintf("%d", newExpenseID)
+
+	// 查詢 Expense_category 對應的 ID
+	var categoryID string
+	categoryQuery := "SELECT expense_category FROM expense_category WHERE category = ?"
+	err = db.QueryRow(categoryQuery, expense.Expense_category).Scan(&categoryID)
+	if err != nil {
+		if err == sql.ErrNoRows {
+			return fmt.Errorf("找不到對應的支出分類: %s", expense.Expense_category)
+		}
+		return fmt.Errorf("查詢支出分類失敗: %w", err)
+	}
+
+	// 查詢 Account 對應的 ID
+	var accountID string
+	accountQuery := "SELECT account_id FROM account WHERE account = ?"
+	err = db.QueryRow(accountQuery, expense.Account).Scan(&accountID)
+	if err != nil {
+		if err == sql.ErrNoRows {
+			return fmt.Errorf("找不到對應的帳戶: %s", expense.Account)
+		}
+		return fmt.Errorf("查詢帳戶失敗: %w", err)
+	}
+
+	expense.User_id = user_id
+
+	// 插入支出資料
+	insertQuery := `
+		INSERT INTO user_expense (expense_id, user_id, expense_category, account_id, expense_date, amount, item)
+		VALUES (?, ?, ?, ?, ?, ?, ?)
+	`
+	_, err = db.Exec(
+		insertQuery,
+		expense.Id,
+		expense.User_id,
+		categoryID, // 使用查詢的 categoryID
+		accountID,  // 使用查詢的 accountID
+		expense.Date,
+		expense.Amount,
+		expense.Item, // 支出名稱
+	)
+	if err != nil {
+		return fmt.Errorf("插入支出資料失敗: %w", err)
+	}
+
+	return nil
+}
+
+
 // 插入 ExpensesCatagory 的新資料
 func InsertExpensesCatagory(db *sql.DB, newCatagory string) error {
 	var maxCatagory int
-	query := `SELECT CAST(expenses_catagory AS UNSIGNED) AS max_catagory 
+	query := `SELECT CAST(expenses_catagory AS INT) AS max_catagory 
               FROM expenses_catagory 
               ORDER BY max_catagory DESC 
               LIMIT 1`
@@ -260,7 +384,7 @@ func InsertExpensesCatagory(db *sql.DB, newCatagory string) error {
 // 插入 Account 的新資料
 func InsertAccount(db *sql.DB, newAccountName string) error {
 	var maxAccountID int
-	query := `SELECT CAST(account_id AS UNSIGNED) AS max_account_id 
+	query := `SELECT CAST(account_id AS INT) AS max_account_id 
               FROM account 
               ORDER BY max_account_id DESC 
               LIMIT 1`

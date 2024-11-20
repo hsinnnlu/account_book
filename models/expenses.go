@@ -4,8 +4,8 @@ type Expenses struct {
 	Id            		string
 	User_id        		string
 	Date           		string
-	Account_id			string
+	Account				string
 	Item		 		string
 	Amount				int
-	Expense_catatory	string
+	Expense_category	string
 }
