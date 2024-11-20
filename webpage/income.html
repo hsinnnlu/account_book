@@ -62,30 +62,29 @@
         <!-- 按鈕群組 -->
         <div class="d-flex justify-content-between mb-4">
             <button id="add-income" class="btn btn-custom">新增收入</button>
-            <button id="category-filter" class="btn btn-custom">選擇分類</button>
         </div>
 
         <!-- 收入明細表格 -->
         <div class="table-responsive">
-            <table class="table table-hover align-middle">
+            <table class="table table-hover align-middle table" id = "income-table">
                 <thead>
                     <tr>
                         <th scope="col">日期</th>
                         <th scope="col">類別</th>
                         <th scope="col">金額</th>
                         <th scope="col">帳戶</th>
-                        <th scope="col">備註</th> <!-- 新增備註欄位 -->
+                        <th scope="col">備註</th>
                         <th scope="col">操作</th>
                     </tr>
                 </thead>
-                <tbody id="income-table">
-                    <!-- 收入明細將動態加載於此 -->
+                <tbody>
+                    <!-- 資料將由 JS 動態插入 -->
                 </tbody>
             </table>
         </div>
     </div>
 
-    <!-- 新增收入Modal -->
+   <!-- 新增收入Modal -->
     <div class="modal fade" id="incomeModal" tabindex="-1" aria-labelledby="incomeModalLabel" aria-hidden="true">
         <div class="modal-dialog">
             <div class="modal-content">
@@ -102,9 +101,9 @@
                         <div class="mb-3">
                             <label for="income-category" class="form-label">收入分類</label>
                             <select class="form-select" id="income-category" required>
-                                <option value="salary">薪水</option>
-                                <option value="investment">投資</option>
-                                <option value="freelance">獎金</option>
+                                <option value="薪水">薪水</option>
+                                <option value="投資">投資</option>
+                                <option value="獎金">獎金</option>
                             </select>
                         </div>
                         <div class="mb-3">
@@ -114,16 +113,16 @@
                         <div class="mb-3">
                             <label for="income-payment" class="form-label">帳戶</label>
                             <select class="form-select" id="income-payment" required>
-                                <option value="cash">現金</option>
-                                <option value="bank-transfer">銀行轉帳</option>
-                                <option value="credit-card">信用卡</option>
+                                <option value="現金">現金</option>
+                                <option value="銀行轉帳">銀行轉帳</option>
+                                <option value="信用卡">信用卡</option>
                             </select>
                         </div>
-                        <div class="mb-3"> <!-- 新增備註欄位 -->
+                        <div class="mb-3"> 
                             <label for="income-note" class="form-label">備註</label>
                             <textarea class="form-control" id="income-note" rows="2"></textarea>
                         </div>
-                        <button type="submit" class="btn btn-primary">新增</button>
+                        <button type="submit" class="btn btn-custom">新增</button>
                     </form>
                 </div>
             </div>

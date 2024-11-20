@@ -14,7 +14,7 @@ func main() {
 
 	router := gin.Default()
 	router.Use(auth.InitSession("secret"))
-	
+
 	router.Static("/js", "./js")
 	router.Static("/css", "./css")
 	router.Static("/img", "./img")
@@ -27,8 +27,12 @@ func main() {
 	router.POST("/register", service.SignUp)
 
 	router.GET("/webpage/account_book.html", auth.AuthMiddleware(), service.AccountBookHandler)
-	router.GET("/webpage/expense.html", auth.AuthMiddleware(), service.ExpenseHandler)
+	router.GET("/webpage/expenses.html", auth.AuthMiddleware(), service.ExpenseHandler)
 	router.GET("/webpage/income.html", auth.AuthMiddleware(), service.IncomeHandler)
+
+	router.GET("/api/incomes", auth.AuthMiddleware(), service.IncomeDataHandler)
+	router.DELETE("/api/incomes/:id", service.Deleteincomerow)
+	router.POST("/api/incomes/insertincome", service.Insertincomerow)
 
 	router.Run(":8080")
 }
