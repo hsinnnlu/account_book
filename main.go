@@ -18,7 +18,6 @@ func main() {
 	router.Static("/js", "./js")
 	router.Static("/css", "./css")
 	router.Static("/img", "./img")
-	// router.Static("/webpage", "./webpage")
 
 	router.LoadHTMLGlob(("webpage/*"))
 
@@ -26,16 +25,29 @@ func main() {
 	router.POST("/login", service.LoginAuth)
 	router.POST("/register", service.SignUp)
 
-	router.GET("/webpage/account_book.html", auth.AuthMiddleware(), service.AccountBookHandler)
-	router.GET("/webpage/expenses.html", auth.AuthMiddleware(), service.ExpenseHandler)
-	router.GET("/webpage/income.html", auth.AuthMiddleware(), service.IncomeHandler)
+	authorized := router.Group("/")
+	authorized.Use(auth.AuthMiddleware())
+	{
+		// 網頁相關路由
+		authorized.GET("/webpage/account_book.html", service.AccountBookHandler)
+		authorized.GET("/webpage/expenses.html", service.ExpenseHandler)
+		authorized.GET("/webpage/income.html", service.IncomeHandler)
+		authorized.GET("/webpage/chart.html", service.ChartHandler)
 
-	router.GET("/api/incomes", auth.AuthMiddleware(), service.IncomeDataHandler)
-	router.DELETE("/api/incomes/:id", service.Deleteincomerow)
-	router.POST("/api/incomes/insertincome", service.Insertincomerow)
+		// API 路由
+		authorized.GET("/api/incomes", service.IncomeDataHandler)
+		authorized.DELETE("/api/incomes/:id", service.Deleteincomerow)
+		authorized.POST("/api/incomes/insertincome", service.Insertincomerow)
 
-	router.GET("/api/expenses", auth.AuthMiddleware(), service.ExpenseDataHandler)
-	router.DELETE("/api/expenses/:id", service.Deleteexpenserow)
-	router.POST("/api/expenses/insertexpense", service.Insertexpenserow)
+		authorized.GET("/api/expenses", service.ExpenseDataHandler)
+		authorized.DELETE("/api/expenses/:id", service.Deleteexpenserow)
+		authorized.POST("/api/expenses/insertexpense", service.Insertexpenserow)
+
+		authorized.GET("/api/incomechart", service.ChartIncomeDataHandler)
+		authorized.GET("/api/expensechart", service.ChartExpenseDataHandler)
+
+		authorized.POST("/api/logout", service.LogoutHandler)
+	}
+
 	router.Run(":8080")
 }

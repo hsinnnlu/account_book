@@ -352,59 +352,91 @@ func InsertExpense(db *sql.DB, expense models.Expenses, user_id string) error {
 	return nil
 }
 
+// chart資料
+func GetExpenseSummary(db *sql.DB, userID string) ([]models.Chart_expense, error) {
+	query := `
+		SELECT 
+			ec.category AS expense_category, 
+			COALESCE(SUM(e.amount), 0) AS total_amount
+		FROM expense_category ec
+		LEFT JOIN user_expense e 
+			ON e.expense_category = ec.expense_category AND e.user_id = ?
+		GROUP BY ec.category
+		ORDER BY total_amount DESC
+	`
 
-// 插入 ExpensesCatagory 的新資料
-func InsertExpensesCatagory(db *sql.DB, newCatagory string) error {
-	var maxCatagory int
-	query := `SELECT CAST(expenses_catagory AS INT) AS max_catagory 
-              FROM expenses_catagory 
-              ORDER BY max_catagory DESC 
-              LIMIT 1`
-	err := db.QueryRow(query).Scan(&maxCatagory)
+	rows, err := db.Query(query, userID)
 	if err != nil {
-		if err == sql.ErrNoRows {
-			maxCatagory = 0
-		} else {
-			return err
+		return nil, fmt.Errorf("查詢支出分類匯總失敗: %v", err)
+	}
+	defer rows.Close()
+
+	var expenses []models.Chart_expense
+	for rows.Next() {
+		var expense models.Chart_expense
+		var totalAmount int
+
+		// 扫描資料列
+		err := rows.Scan(&expense.Expense_catagory, &totalAmount)
+		if err != nil {
+			return nil, fmt.Errorf("掃描支出分類匯總資料失敗: %v", err)
 		}
+
+		// 將數字轉換為字串並存入結構體
+		expense.Expense_amount = fmt.Sprintf("%d", totalAmount)
+		expenses = append(expenses, expense)
 	}
 
-	newExpensesCatagory := maxCatagory + 1
-
-	insertQuery := `INSERT INTO expenses_catagory (expenses_catagory, catagory) VALUES (?, ?)`
-	_, err = db.Exec(insertQuery, fmt.Sprintf("%d", newExpensesCatagory), newCatagory)
-	if err != nil {
-		return err
+	for _, expense := range expenses {
+		fmt.Printf("分類: %s, 總金額: %s\n", expense.Expense_catagory, expense.Expense_amount)
 	}
 
-	fmt.Printf("新增成功,expenses_catagory: %d, catagory: %s\n", newExpensesCatagory, newCatagory)
-	return nil
+	if len(expenses) == 0 {
+		log.Println("支出分類匯總結果為空")
+	}
+	return expenses, nil
 }
 
-// 插入 Account 的新資料
-func InsertAccount(db *sql.DB, newAccountName string) error {
-	var maxAccountID int
-	query := `SELECT CAST(account_id AS INT) AS max_account_id 
-              FROM account 
-              ORDER BY max_account_id DESC 
-              LIMIT 1`
-	err := db.QueryRow(query).Scan(&maxAccountID)
+func GetIncomeSummary(db *sql.DB, userID string) ([]models.Chart_income, error) {
+	query := `
+		SELECT 
+			ic.category AS income_category, 
+			COALESCE(SUM(i.amount), 0) AS total_amount
+		FROM income_category ic
+		LEFT JOIN income i 
+			ON i.income_category = ic.income_category AND i.user_id = ?
+		GROUP BY ic.category
+		ORDER BY total_amount DESC
+	`
+
+	rows, err := db.Query(query, userID)
 	if err != nil {
-		if err == sql.ErrNoRows {
-			maxAccountID = 0
-		} else {
-			return err
+		return nil, fmt.Errorf("查詢收入分類匯總失敗: %v", err)
+	}
+	defer rows.Close()
+
+	var incomes []models.Chart_income
+	for rows.Next() {
+		var income models.Chart_income
+		var totalAmount int
+
+		// 扫描資料列
+		err := rows.Scan(&income.Income_catagory, &totalAmount)
+		if err != nil {
+			return nil, fmt.Errorf("掃描收入分類匯總資料失敗: %v", err)
 		}
+
+		// 將數字轉換為字串並存入結構體
+		income.Income_amount = fmt.Sprintf("%d", totalAmount)
+		incomes = append(incomes, income)
 	}
 
-	newAccountID := maxAccountID + 1
-
-	insertQuery := `INSERT INTO account (account_id, account_name) VALUES (?, ?)`
-	_, err = db.Exec(insertQuery, fmt.Sprintf("%d", newAccountID), newAccountName)
-	if err != nil {
-		return err
+	for _, income := range incomes {
+		fmt.Printf("分類: %s, 總金額: %s\n", income.Income_catagory, income.Income_amount)
 	}
 
-	fmt.Printf("新增成功,account_id: %d, account_name: %s\n", newAccountID, newAccountName)
-	return nil
+	if len(incomes) == 0 {
+		log.Println("收入分類匯總結果為空")
+	}
+	return incomes, nil
 }

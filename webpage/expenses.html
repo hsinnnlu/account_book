@@ -31,18 +31,12 @@
                         </ul>
                     </li>
                     <li class="nav-item dropdown">
-                        <a class="nav-link dropdown-toggle active" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-                            圖表分析
-                        </a>
-                        <ul class="dropdown-menu">
-                            <li><a class="dropdown-item" href="#">支出類別表</a></li>
-                            <li><a class="dropdown-item" href="#">支出帳戶比</a></li>
-                        </ul>
+                        <a class="nav-link active" aria-current="page" href="chart.html">圖表分析</a>
                     </li>
                 </ul>
-                <ul class="navbar-nav ms-auto"> <!-- 使用 ms-auto 將 logout 鏈接推到最右邊 -->
+                <ul class="navbar-nav ms-auto">
                     <li class="nav-item">
-                        <a class="nav-link" href="#">Logout</a> <!-- 添加 logout 鏈接 -->
+                        <a class="nav-link" href="#" id="logoutBtn">Logout</a>
                     </li>
                 </ul>
             </div>
@@ -103,7 +97,7 @@
                             <select class="form-select" id="expense-category" required>
                                 <option value="食物">食物</option>
                                 <option value="交通">交通</option>
-                                <option value="房租">房租</option>
+                                <option value="衣服">衣服</option>
                             </select>
                         </div>
                         <div class="mb-3">

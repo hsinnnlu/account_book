@@ -165,3 +165,51 @@ $('#add-income').on('click', function() {
 $(document).ready(() => {
     fetchIncomes(); // 獲取收入資料並渲染
 });
+
+document.getElementById("logoutBtn").addEventListener("click", function(event) {
+    event.preventDefault();  // 防止頁面跳轉
+
+    // 發送登出請求給後端
+    fetch("/api/logout", {
+        method: "POST",  // 使用 POST 請求
+        headers: {
+            "Content-Type": "application/json",
+        },
+    })
+    .then(response => {
+        if (response.ok) {
+            // 顯示登出成功訊息
+            const messageDiv = document.getElementById("logoutMessage");
+            messageDiv.style.display = "block";  // 顯示訊息框
+
+            // 等待 2 秒後重定向到 login 頁面
+            setTimeout(function() {
+                window.location.href = "/login";  // 假設登入頁面的 URL 是 /login
+            }, 1000);  // 1 秒後跳轉
+        } else {
+            console.error("登出失敗");
+        }
+    })
+    .catch(error => console.error("Error logging out:", error));
+});
+
+document.getElementById("logoutBtn").addEventListener("click", function(event) {
+    event.preventDefault();  // 防止頁面跳轉
+
+    // 發送登出請求給後端
+    fetch("/api/logout", {
+        method: "POST",  // 使用 POST 請求
+        headers: {
+            "Content-Type": "application/json",
+        },
+    })
+    .then(response => {
+        if (response.ok) {
+            // 如果登出成功，重定向到 login 頁面
+            window.location.href = "/login";  // 這裡假設登入頁面的 URL 是 /login
+        } else {
+            console.error("登出失敗");
+        }
+    })
+    .catch(error => console.error("Error logging out:", error));
+});
