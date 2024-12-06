@@ -12,6 +12,7 @@ import (
 
 var DB *sql.DB // 全局變量, 小寫db是外地注入變量
 
+// 初始化資料庫
 func InitDB() {
 	connectionString := "server=127.0.0.1,1433;trusted_connection=yes;database=Accountbook;"
 
@@ -31,9 +32,10 @@ func InitDB() {
 	fmt.Println("資料庫連接成功")
 }
 
+// 檢查使用者帳號是否存在 db
 func GetUserById(db *sql.DB, user_id string) (*models.User, error) {
 	user := models.User{}
-	query := "SELECT user_id, hash_password FROM users WHERE user_id = ?"
+	query := "EXEC GetUserById @UserID = ?"
 	err := DB.QueryRow(query, user_id).Scan(&user.Id, &user.Hash_password)
 	if err != nil {
 		// 如果找不到使用者
@@ -46,7 +48,7 @@ func GetUserById(db *sql.DB, user_id string) (*models.User, error) {
 	return &user, nil
 }
 
-// 插入使用者帳號與密碼
+// 註冊-插入使用者帳號與密碼
 func InsertUser(user_id, hash_password string) error {
 	query := "INSERT INTO users (user_id, hash_password) VALUES (?, ?)"
 
@@ -61,19 +63,18 @@ func InsertUser(user_id, hash_password string) error {
 }
 
 // 取得 DB 裡面的 income 資料
+// 用VIEW
 func GetIncome(db *sql.DB, user_id string) ([]models.Income, error) {
 	query := `
 		SELECT 
-			i.income_id,
-			CONVERT(varchar, i.income_date, 23) AS income_date, 
-			ic.category AS income_category, 
-			i.amount, 
-			a.account AS account_name, 
-			i.memo
-		FROM income i
-		JOIN income_category ic ON i.income_category = ic.income_category
-		JOIN account a ON i.account_id = a.account_id
-		WHERE i.user_id = ?
+			income_id,
+			income_date,
+			income_category,
+			amount,
+			account_name,
+			memo
+		FROM vw_user_income
+		WHERE user_id = ?;
 	`
 
 	// 執行查詢
@@ -121,18 +122,14 @@ func GetIncome(db *sql.DB, user_id string) ([]models.Income, error) {
 }
 
 // 刪除一筆收入資料
-func DeleteIncome(db *sql.DB, income_id string) error {
+func DeleteIncome(db *sql.DB, income_id string) string {
 	query := "DELETE FROM income WHERE income_id = ?"
-	result, err := db.Exec(query, income_id)
-	if err != nil {
-		return err
-	}
+	_, err := db.Exec(query, income_id)
 
-	rowsAffected, err := result.RowsAffected()
-	if rowsAffected == 0 {
-		return err
+	if errMsg := err.Error(); errMsg != "" {
+		return errMsg 
 	}
-	return nil
+	return "" 
 }
 
 // InsertIncome 將單筆收入資料插入資料庫
@@ -195,50 +192,18 @@ func InsertIncome(db *sql.DB, income models.Income, user_id string) error {
 	return nil
 }
 
-func InsertIncomeCatagory(db *sql.DB, newCatagory string) error {
-	// 查詢目前最大的 income_catagory
-	var maxCatagory int
-	query := `SELECT CAST(income_catagory AS INT) AS max_catagory 
-              FROM income_catagory 
-              ORDER BY max_catagory DESC 
-              LIMIT 1`
-	err := db.QueryRow(query).Scan(&maxCatagory)
-	if err != nil {
-		// 如果查詢失敗但沒有記錄，表示資料表可能是空的
-		if err == sql.ErrNoRows {
-			maxCatagory = 0
-		} else {
-			return err
-		}
-	}
-
-	// 計算下一個 income_catagory
-	newIncomeCatagory := maxCatagory + 1
-
-	// 插入新資料
-	insertQuery := `INSERT INTO income_catagory (income_catagory, catagory) VALUES (?, ?)`
-	_, err = db.Exec(insertQuery, fmt.Sprintf("%d", newIncomeCatagory), newCatagory)
-	if err != nil {
-		return err
-	}
-
-	fmt.Printf("新增成功，income_catagory: %d, catagory: %s\n", newIncomeCatagory, newCatagory)
-	return nil
-}
-
+// 用VIEW
 func GetExpenses(db *sql.DB, user_id string) ([]models.Expenses, error) {
 	query := `
 		SELECT 
-			e.expense_id,
-			CONVERT(varchar, e.expense_date, 23) AS expense_date, 
-			ec.category AS expense_category, 
-			e.item,
-			e.amount, 
-			a.account AS account_name 
-		FROM user_expense e
-		JOIN expense_category ec ON e.expense_category = ec.expense_category
-		JOIN account a ON e.account_id = a.account_id
-		WHERE e.user_id = ?
+			expense_id,
+			expense_date,
+			expense_category,
+			item,
+			amount,
+			account_name
+		FROM vw_user_expense
+		WHERE user_id = ?;
 	`
 
 	// 執行查詢
@@ -254,7 +219,7 @@ func GetExpenses(db *sql.DB, user_id string) ([]models.Expenses, error) {
 	// 逐列處理查詢結果
 	for rows.Next() {
 		var expense models.Expenses
-		
+
 		// 扫描資料列
 		err := rows.Scan(&expense.Id, &expense.Date, &expense.Expense_category, &expense.Item, &expense.Amount, &expense.Account)
 		if err != nil {
@@ -277,19 +242,15 @@ func GetExpenses(db *sql.DB, user_id string) ([]models.Expenses, error) {
 	return expenses, nil
 }
 
-// 刪除一筆收入資料
-func DeleteExpense(db *sql.DB, expense_id string) error {
+// 刪除一筆支出資料
+func DeleteExpense(db *sql.DB, expense_id string) string {
 	query := "DELETE FROM user_expense WHERE expense_id = ?"
-	result, err := db.Exec(query, expense_id)
-	if err != nil {
-		return err
-	}
+	_, err := db.Exec(query, expense_id)
 
-	rowsAffected, err := result.RowsAffected()
-	if rowsAffected == 0 {
-		return err
+	if errMsg := err.Error(); errMsg != "" {
+		return errMsg 
 	}
-	return nil
+	return "" 
 }
 
 // InsertExpense 將單筆支出資料插入資料庫
@@ -439,4 +400,17 @@ func GetIncomeSummary(db *sql.DB, userID string) ([]models.Chart_income, error) 
 		log.Println("收入分類匯總結果為空")
 	}
 	return incomes, nil
+}
+
+// update password
+func UpdatePassword(hashedPassword, userID string) error{
+	query := "UPDATE users SET hash_password = ? WHERE user_id = ?"
+
+	// 執行更新操作
+	_, err := DB.Exec(query, hashedPassword, userID)
+	if err != nil {
+		return err
+	}
+
+	return nil
 }

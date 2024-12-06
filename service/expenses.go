@@ -40,19 +40,19 @@ func ExpenseDataHandler(c *gin.Context) {
 }
 
 func Deleteexpenserow(c *gin.Context) {
-	expenseID := c.Param("id") // 從路徑參數中獲取 income_id
+	expenseID := c.Param("id") // 從路徑參數中獲取
 
 	println("expense_id: ", expenseID)
-	err := db.DeleteExpense(db.DB, expenseID)
-	if err != nil {
+	str := db.DeleteExpense(db.DB, expenseID)
+	if str == "" {
 		c.JSON(http.StatusInternalServerError, gin.H{
-			"error": fmt.Sprintf("刪除失敗: %v", err),
+			"error": "刪除失敗",
 		})
 		return
 	}
 
 	c.JSON(http.StatusOK, gin.H{
-		"message": "刪除成功！",
+		"message": str,
 	})
 }
 

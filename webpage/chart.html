@@ -35,10 +35,23 @@
                     </li>
                 </ul>
                 <ul class="navbar-nav ms-auto">
-                    <li class="nav-item">
-                        <a class="nav-link" href="#" id="logoutBtn">Logout</a>
+                    <!-- 設定下拉選單 -->
+                    <li class="nav-item dropdown">
+                        <a 
+                            class="nav-link dropdown-toggle" 
+                            href="#" 
+                            id="settingsDropdown" 
+                            role="button" 
+                            data-bs-toggle="dropdown" 
+                            aria-expanded="false">
+                            Settings
+                        </a>
+                        <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="settingsDropdown">
+                            <li><a class="dropdown-item" href="#" id="changePasswordBtn" data-bs-toggle="modal" data-bs-target="#changePasswordModal">Change Password</a></li>                       
+                            <li><a class="dropdown-item" href="#" id="logoutBtn">Logout</a></li>
+                        </ul>
                     </li>
-                </ul>
+                </ul>                
             </div>
         </div>
     </nav>
@@ -85,7 +98,34 @@
                 </div>
             </div>
         </div>          
-    </div>   
+    </div>
+    <div class="modal fade" id="changePasswordModal" tabindex="-1" aria-labelledby="changePasswordModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="changePasswordModalLabel">Change Password</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="changePasswordForm">
+                        <div class="mb-3">
+                            <label for="newPassword" class="form-label">New Password</label>
+                            <input type="password" class="form-control" id="newPassword" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="confirmNewPassword" class="form-label">Confirm New Password</label>
+                            <input type="password" class="form-control" id="confirmNewPassword" required>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="button" class="btn btn-primary" id="submitChangePassword">Submit</button>
+                </div>
+            </div>
+        </div>
+    </div>
+       
 
     <footer class="footer-custom">
         <div class="container text-center">

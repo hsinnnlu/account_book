@@ -46,16 +46,16 @@ func Deleteincomerow(c *gin.Context) {
 	incomeID := c.Param("id") // 從路徑參數中獲取 income_id
 
 	println("income_id: ", incomeID)
-	err := db.DeleteIncome(db.DB, incomeID)
-	if err != nil {
+	str := db.DeleteIncome(db.DB, incomeID)
+	if str == "" {
 		c.JSON(http.StatusInternalServerError, gin.H{
-			"error": fmt.Sprintf("刪除失敗: %v", err),
+			"error": "刪除失敗",
 		})
 		return
 	}
 
 	c.JSON(http.StatusOK, gin.H{
-		"message": "刪除成功！",
+		"message": str,
 	})
 }
 

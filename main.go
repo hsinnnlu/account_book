@@ -47,6 +47,7 @@ func main() {
 		authorized.GET("/api/expensechart", service.ChartExpenseDataHandler)
 
 		authorized.POST("/api/logout", service.LogoutHandler)
+		authorized.POST("/api/reset-password", service.ResetpasswordHandler)
 	}
 
 	router.Run(":8080")

@@ -82,10 +82,12 @@ $('#expense-table').on('click', '.delete-expense', function () {
     const $button = $(this);
     const expenseId = $button.data('id');
 
-    if (!confirm('確定要刪除此收入紀錄嗎？')) {
+    // 確認刪除
+    if (!confirm('確定要刪除此支出紀錄嗎？')) {
         return;
     }
 
+    // 發送 DELETE 請求
     fetch(`/api/expenses/${expenseId}`, {
         method: 'DELETE',
         headers: {
@@ -93,6 +95,7 @@ $('#expense-table').on('click', '.delete-expense', function () {
         },
     })
         .then(response => {
+            // 處理非 200-299 的 HTTP 狀態碼
             if (!response.ok) {
                 return response.json().then(data => {
                     throw new Error(data.error || '刪除失敗');
@@ -101,14 +104,18 @@ $('#expense-table').on('click', '.delete-expense', function () {
             return response.json();
         })
         .then(data => {
-            fetchExpenses(); // 刪除成功後重新渲染表格
+            // 顯示後端返回的成功訊息
             alert(data.message || '刪除成功！');
+            // 重新渲染表格
+            fetchExpenses();
         })
         .catch(error => {
-            console.error('刪除收入時出錯:', error);
-            alert('刪除收入失敗: ' + error.message);
+            // 顯示後端返回的錯誤訊息
+            console.error('刪除支出時出錯:', error);
+            alert('刪除支出失敗: ' + error.message);
         });
 });
+
 
 $('#expense-form').on('submit', function(event) {
     event.preventDefault(); // 阻止表單默認提交
@@ -160,8 +167,6 @@ $('#expense-form').on('submit', function(event) {
     .catch(error => console.error('新增支出時出錯:', error)); // 處理錯誤
 });
 
-
-
 // 開啟新增支出Modal
 $('#add-expense').on('click', function() {
     $('#expenseModal').modal('show');
@@ -184,14 +189,8 @@ document.getElementById("logoutBtn").addEventListener("click", function(event) {
     })
     .then(response => {
         if (response.ok) {
-            // 顯示登出成功訊息
-            const messageDiv = document.getElementById("logoutMessage");
-            messageDiv.style.display = "block";  // 顯示訊息框
-
-            // 等待 2 秒後重定向到 login 頁面
-            setTimeout(function() {
-                window.location.href = "/login";  // 假設登入頁面的 URL 是 /login
-            }, 1000);  // 1 秒後跳轉
+            // 如果登出成功，重定向到 login 頁面
+            window.location.href = "/login";  // 這裡假設登入頁面的 URL 是 /login
         } else {
             console.error("登出失敗");
         }
@@ -218,4 +217,53 @@ document.getElementById("logoutBtn").addEventListener("click", function(event) {
         }
     })
     .catch(error => console.error("Error logging out:", error));
+});
+
+document.addEventListener('DOMContentLoaded', () => {
+    document.getElementById('submitChangePassword').addEventListener('click', function () {
+        const newPassword = document.getElementById('newPassword').value;
+        const confirmNewPassword = document.getElementById('confirmNewPassword').value;
+
+        // 確認輸入框內容
+        if (!newPassword || !confirmNewPassword) {
+            alert('請輸入新密碼和確認密碼。');
+            return;
+        }
+
+        if (newPassword !== confirmNewPassword) {
+            alert('新密碼和確認密碼不一致，請重新輸入。');
+            return;
+        }
+
+        // 發送 API 請求
+        fetch('/api/reset-password', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                NewPassword: newPassword,
+                ComNewPassword: confirmNewPassword,
+            }),
+        })
+            .then(response => {
+                if (!response.ok) {
+                    return response.json().then(data => {
+                        throw new Error(data.error || '密碼修改失敗');
+                    });
+                }
+                return response.json();
+            })
+            .then(data => {
+                // 成功提示
+                alert(data.message || '密碼修改成功！');
+                // 關閉模態框
+                const modal = bootstrap.Modal.getInstance(document.getElementById('changePasswordModal'));
+                modal.hide();
+            })
+            .catch(error => {
+                console.error('修改密碼時出錯:', error);
+                alert('密碼修改失敗: ' + error.message);
+            });
+    });
 });
